@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { Priority, TodoItem } from "../models/TodoItem";
+import { authToken, AuthRequest } from "../middleware/authToken";
 
 const router = Router();
 
@@ -29,10 +30,9 @@ function isValidPriority(priority: any): priority is Priority {
 
 // CRUD api
 // GET /todos?priority=low|medium|high&userEmail=user@gmail.com
-router.get("/", (req: Request, res: Response) => {
+router.get("/", authToken, (req: AuthRequest, res: Response) => {
 	try {
 		const { priority, userEmail } = req.query;
-
 		let todos = todoList;
 
 		// allow for filtering by priority/owner
@@ -54,7 +54,7 @@ router.get("/", (req: Request, res: Response) => {
 });
 
 // POST /todos
-router.post("/", (req: Request, res: Response) => {
+router.post("/", authToken, (req: AuthRequest, res: Response) => {
 	try {
 		const { priority, content } = req.body;
 
@@ -72,9 +72,7 @@ router.post("/", (req: Request, res: Response) => {
 			});
 		}
 
-		const userEmail = "user@gmail.com"; // placeholder
-
-		const todo = createTodo(userEmail, priority, content);
+		const todo = createTodo(req.user, priority, content);
 		todoList.push(todo);
 		res.json({
 			success: true,
@@ -89,7 +87,7 @@ router.post("/", (req: Request, res: Response) => {
 });
 
 // PUT /todos/:id
-router.put("/:id", (req: Request, res: Response) => {
+router.put("/:id", authToken, (req: AuthRequest, res: Response) => {
 	try {
 		const todo = todoList.find((t) => t.id === Number(req.params.id));
 
@@ -97,6 +95,14 @@ router.put("/:id", (req: Request, res: Response) => {
 			return res.status(404).json({
 				success: false,
 				error: "todo not found",
+			});
+		}
+
+		// ownership authentication
+		if (!req.user || req.user !== todo.userEmail) {
+			return res.status(401).json({
+				success: false,
+				error: "unauthorized",
 			});
 		}
 
@@ -137,7 +143,7 @@ router.put("/:id", (req: Request, res: Response) => {
 });
 
 // DELETE /todos/:id
-router.delete("/:id", (req: Request, res: Response) => {
+router.delete("/:id", authToken, (req: AuthRequest, res: Response) => {
 	try {
 		const indexToRemove = todoList.findIndex(
 			(t) => t.id === Number(req.params.id)
@@ -147,6 +153,14 @@ router.delete("/:id", (req: Request, res: Response) => {
 			return res.status(404).json({
 				success: false,
 				error: "todo not found",
+			});
+		}
+
+		// ownership authentication
+		if (!req.user || req.user !== todoList[indexToRemove].userEmail) {
+			return res.status(401).json({
+				success: false,
+				error: "unauthorized",
 			});
 		}
 

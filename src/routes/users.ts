@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { User } from "../models/User";
+import jwt from "jsonwebtoken";
 
 const router = Router();
 
@@ -55,9 +56,11 @@ router.post("/login", (req: Request, res: Response) => {
 		}
 
 		if (user.password === req.body.password) {
+			const token = jwt.sign({ user: user.email }, process.env.JWT_SECRET!);
+
 			res.json({
 				success: true,
-				data: user.email,
+				data: { token },
 			});
 		} else {
 			res.status(401).json({

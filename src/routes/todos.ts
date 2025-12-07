@@ -72,7 +72,7 @@ router.post("/", authToken, (req: AuthRequest, res: Response) => {
 			});
 		}
 
-		const todo = createTodo(req.user, priority, content);
+		const todo = createTodo(req.user!, priority, content);
 		todoList.push(todo);
 		res.json({
 			success: true,

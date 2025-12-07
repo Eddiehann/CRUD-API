@@ -45,7 +45,7 @@ router.get("/", authToken, (req: AuthRequest, res: Response) => {
 			success: true,
 			data: todos,
 		});
-	} catch (err) {
+	} catch (err: any) {
 		res.status(500).json({
 			success: false,
 			error: err.message,
@@ -78,7 +78,7 @@ router.post("/", authToken, (req: AuthRequest, res: Response) => {
 			success: true,
 			data: todo,
 		});
-	} catch (err) {
+	} catch (err: any) {
 		res.status(500).json({
 			success: false,
 			error: err.message,
@@ -169,7 +169,7 @@ router.delete("/:id", authToken, (req: AuthRequest, res: Response) => {
 			success: true,
 			data: todoList,
 		});
-	} catch (err) {
+	} catch (err: any) {
 		res.status(500).json({
 			success: false,
 			error: err.message,

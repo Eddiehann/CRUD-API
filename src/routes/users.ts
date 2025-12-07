@@ -34,7 +34,7 @@ router.post("/", (req: Request, res: Response) => {
 			success: true,
 			data: user.email,
 		});
-	} catch (err) {
+	} catch (err: any) {
 		res.status(500).json({
 			success: false,
 			error: err.message,
@@ -68,7 +68,7 @@ router.post("/login", (req: Request, res: Response) => {
 				error: "invalid password",
 			});
 		}
-	} catch (err) {
+	} catch (err: any) {
 		res.status(500).json({
 			success: false,
 			error: err.message,
